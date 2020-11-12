@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      database: acal
+      uri: mongodb+srv://acal-user:sDUrcOv9VcgLjLrG@cluster0.ddutk.gcp.mongodb.net/acal-user?retryWrites=true&w=majority
