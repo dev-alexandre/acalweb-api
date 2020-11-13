@@ -1,4 +1,4 @@
-package br.com.acal.acalapi;
+package br.com.acalapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
