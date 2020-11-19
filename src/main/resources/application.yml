@@ -1,6 +1,22 @@
 spring:
-  data:
-    mongodb:
-      auto-index-creation: false
-      database: acal
-      uri: mongodb+srv://acal-user:sDUrcOv9VcgLjLrG@cluster0.ddutk.gcp.mongodb.net/acal-user?retryWrites=true&w=majority
+  profiles:
+    active: stg
+
+security:
+  require-ssl=true:
+
+server:
+  port: 443
+  ssl:
+    enable: true
+    key-alias: acal
+    key-store-type: PKCS12
+    key-store: classpath:keystore/acalcert.p12
+    key-store-password: '9yOwEEH&h%#&'
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
+
+trust:
+  store: classpath:keystore/acalcert.p12
+  password: '9yOwEEH&h%#&'

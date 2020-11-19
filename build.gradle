@@ -24,19 +24,27 @@ repositories {
 
 dependencies {
 
+	//Swager
 	compile('io.springfox:springfox-swagger2:2.9.2')
 	compile('io.springfox:springfox-swagger-ui:2.9.2')
 
+	//database
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+	//lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	//java money
+	compile group: 'org.javamoney', name: 'moneta', version: '1.4.2', ext: 'pom'
+
+	//bind
 	compile "com.fasterxml.jackson.core:jackson-databind:2.9.7"
 	compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7"
+
+
 	compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
-	compile group: 'org.javamoney', name: 'moneta', version: '1.4.2', ext: 'pom'
 
 	//security
 	compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.3.0.RELEASE'
@@ -55,6 +63,12 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api
 	compile group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
+
+
+	//SSL
+	// https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

@@ -18,10 +18,21 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String nome) throws UsernameNotFoundException {
-        return
-            mongoTemplate.findOne(
-                new Query().addCriteria(Criteria.where("email").regex("^" + nome + "$")),
-                Usuario.class);
+
+        if(nome == null || nome.isEmpty() ){
+            throw new UsernameNotFoundException("Usuário não encontrado.");
+        }
+
+        var user =
+            mongoTemplate
+                .findOne(new Query().addCriteria(Criteria.where("email").regex("^" + nome.toLowerCase() + "$")),Usuario.class);
+
+        if(user == null){
+            throw new UsernameNotFoundException("Usuário não encontrado.");
+        }
+
+        return user;
+
     }
 
 }

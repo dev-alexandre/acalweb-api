@@ -30,7 +30,6 @@ public class TokenAuthenticationService {
 
         var usuario = (Usuario) auth.getPrincipal();
 
-
         JwtBuilder jwt = Jwts.builder()
             .setSubject(auth.getName())
             .claim("role", auth.getAuthorities())

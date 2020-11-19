@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      auto-index-creation: false
+      database: acal
+      user: admin
+      password: password
+      port: 27017
+      host: localhost
+
+certificado: /home/wwacal/java/acalcert.p12

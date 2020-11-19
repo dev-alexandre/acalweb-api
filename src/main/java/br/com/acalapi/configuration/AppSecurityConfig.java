@@ -24,8 +24,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailService userDetailService;
 
     @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
+    protected void configure(HttpSecurity http) throws Exception {
+        http
             .csrf().disable()
             .cors().and()
             .authorizeRequests()
@@ -35,7 +35,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET,"/v2/api-docs").permitAll()
             .antMatchers(HttpMethod.GET,"/swagger-ui.html").permitAll()
             .antMatchers(HttpMethod.GET,"/profile").permitAll()
-
 
             .anyRequest().authenticated()
 
