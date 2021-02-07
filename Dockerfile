@@ -1,6 +1,7 @@
 FROM openjdk:11-jre-slim
-ENV APP_HOME=/usr/app/
+VOLUME /tmp
+ARG APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 COPY ./build/libs/* ./app.jar
 EXPOSE 8080
-ENTRYPOINT exec java -jar app.jar
+ENTRYPOINT exec java -Djava.security.egd=file:/dev/./urandom -jar app.jar

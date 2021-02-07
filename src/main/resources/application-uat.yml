@@ -1,11 +1,12 @@
-spring:
-  data:
-    mongodb:
-      auto-index-creation: false
-      database: acal
-      user: admin
-      password: password
-      port: 27017
-      host: localhost
+#spring:
+  #data:
+    #mongodb:
+      #authentication-database: ${MONGO_AUTH:admin}
+      #auto-index-creation: true
+      #database: ${DB_NAME:acal}
+      #user: ${DB_USER:admin}
+      #password: ${DB_PASSWORD:senha_desenvolvimento}
+      #port: ${DB_PORT:27017}
+      #host: ${DB_HOST:mongo}
 
-certificado: /home/wwacal/java/acalcert.p12
+#certificado: /home/wwacal/acal/api/keystore/acalcert.p12

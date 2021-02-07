@@ -25,13 +25,6 @@ import java.util.List;
 public class Usuario extends AE implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    @CreatedDate
-    public LocalDateTime createdDate;
-
-    @LastModifiedDate
-    public LocalDateTime lastModifiedDate;
-
-    @Indexed(unique = true, name = "usuario.email")
     private String email;
     private String password;
     private boolean isAccountNonExpired;

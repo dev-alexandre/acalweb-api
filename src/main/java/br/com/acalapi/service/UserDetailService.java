@@ -23,7 +23,7 @@ public class UserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("Usuário não encontrado.");
         }
 
-        var user =
+        Usuario user =
             mongoTemplate
                 .findOne(new Query().addCriteria(Criteria.where("email").regex("^" + nome.toLowerCase() + "$")),Usuario.class);
 
@@ -32,7 +32,21 @@ public class UserDetailService implements UserDetailsService {
         }
 
         return user;
-
     }
 
+    public boolean isExists(String nome){
+
+        if(nome == null || nome.isEmpty() ){
+            return false;
+        }
+
+        Usuario user = mongoTemplate
+                .findOne(new Query().addCriteria(Criteria.where("name").regex("^" + nome.toLowerCase() + "$")),Usuario.class);
+
+        if(user == null ){
+            return false;
+        }
+
+        return true;
+    }
 }

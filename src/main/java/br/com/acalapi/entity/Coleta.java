@@ -15,9 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Document(collection = "categoria")
-public class Categoria {
+@Document(collection = "coleta")
+public class Coleta {
 
-    private String nome;
+    private String parametro;
+    private String analisado;
+    private String exigido;
+    private String conforme;
 
 }

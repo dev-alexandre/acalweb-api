@@ -2,9 +2,11 @@ package br.com.acalapi.configuration.security;
 
 import br.com.acalapi.entity.security.Usuario;
 import com.google.gson.Gson;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.DefaultJwtParser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -20,7 +22,7 @@ import java.util.Date;
 
 public class TokenAuthenticationService {
 
-    private static final long HOURS_TO_EXPIRATION = 24;
+    private static final long HOURS_TO_EXPIRATION = 48;
 
     private static final String SECRET = "mySecret";
     private static final String TOKEN_PREFIX = "Bearer";
@@ -28,7 +30,7 @@ public class TokenAuthenticationService {
 
     public static void addAuthentication(HttpServletResponse response, Authentication auth) {
 
-        var usuario = (Usuario) auth.getPrincipal();
+        Usuario usuario = (Usuario) auth.getPrincipal();
 
         JwtBuilder jwt = Jwts.builder()
             .setSubject(auth.getName())
@@ -36,6 +38,7 @@ public class TokenAuthenticationService {
             .claim("title", usuario.getTitle())
             .claim("name", usuario.getName())
             .claim("key", usuario.getId())
+            .claim("id", usuario.getId())
             .setExpiration(
                 Date.from(LocalDateTime.now().plusHours(HOURS_TO_EXPIRATION).atZone(ZoneId.systemDefault()).toInstant())
             )
@@ -64,20 +67,25 @@ public class TokenAuthenticationService {
     }
 
 
-    public static Authentication getAuthentication(HttpServletRequest request) {
+    public static Authentication getAuthentication(HttpServletRequest request) throws ExpiredJwtException {
         String token = request.getHeader(HEADER_STRING);
 
-        if (token != null) {
-            String user = Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-                .getBody()
-                .getSubject();
+        try{
 
-            if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+            if (token != null) {
+                String user = Jwts.parser()
+                        .setSigningKey(SECRET)
+                        .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+                        .getBody()
+                        .getSubject();
+
+                if (user != null) {
+                    return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                }
             }
 
+        } catch (IllegalArgumentException| ExpiredJwtException e){
+            throw new RuntimeException("É você não possui permissão");
         }
 
         return null;

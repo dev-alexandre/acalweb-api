@@ -14,12 +14,11 @@ import org.springframework.security.core.GrantedAuthority;
 @EqualsAndHashCode(callSuper = false)
 public class Funcao implements GrantedAuthority {
 
-    @Indexed(unique = true, sparse = true, name = "funcao.nome")
-    private String nome;
+    private String name;
 
     @Override
     public String getAuthority() {
-        return nome;
+        return name;
     }
 
 }

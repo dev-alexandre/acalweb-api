@@ -4,5 +4,13 @@ spring:
       database: acal
       uri: mongodb+srv://acal-user:sDUrcOv9VcgLjLrG@cluster0.ddutk.gcp.mongodb.net/acal-user?retryWrites=true&w=majority
 
+logging:
+  level:
+    hibernate: DEBUG
+    org.springframework:
+      web: DEBUG
+      data.mongodb.core:
+        MongoTemplate: DEBUG
+        ReactiveMongoTemplate: DEBUG
 
 certificado: C:\Users\C83872A\Documents\Workspace\acal\acal-api-6\build\resources\main\keystore\acalcert.p12

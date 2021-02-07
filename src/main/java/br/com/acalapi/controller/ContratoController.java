@@ -2,16 +2,16 @@ package br.com.acalapi.controller;
 
 import br.com.acalapi.controller.filtro.Filtro;
 import br.com.acalapi.entity.Contrato;
-import br.com.acalapi.entity.Referencia;
+import br.com.acalapi.exception.ConflictDataException;
 import br.com.acalapi.repository.ContratoRepository;
 import br.com.acalapi.service.ContratoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,10 +20,10 @@ import java.util.List;
 public class ContratoController extends Controller<Contrato, Filtro>{
 
     @Autowired
-    private ContratoRepository repository;
+    private ContratoService service;
 
     @Autowired
-    private ContratoService service;
+    private ContratoRepository repository;
 
     @Override
     public MongoRepository getRepository() {
@@ -32,13 +32,28 @@ public class ContratoController extends Controller<Contrato, Filtro>{
 
     @Override
     public Sort getSort() {
-        return Sort.by("tipoLogradouro.nome").ascending().and(Sort.by("nome").ascending());
+        return Sort.by("cliente.nome","matricula.logradouro.tipoLogradouro.nome","matricula.logradouro.nome");
     }
 
-
-    @RequestMapping(value="/listar/{mes}/{ano}", method = RequestMethod.GET)
-    public List<Contrato> listar(@PathVariable int mes, @PathVariable int ano){
-        return service.listarContratosDisponiveisPor(new Referencia(mes, ano));
+    @Override
+    public Query getQueryDuplicidade(Contrato contrato) {
+        return new Query().addCriteria(
+            Criteria
+              .where("matricula.numero").is(contrato.getMatricula().getNumero())
+                .and("matricula.letra").is(contrato.getMatricula().getLetra())
+                .and("matricula.logradouro").is(contrato.getMatricula().getLogradouro())
+                .and("habilitado").is(true)
+                .and("ativo").is(true)
+        );
     }
 
+    @RequestMapping(value="/listar/{referencia}", method = RequestMethod.GET)
+    public List<Contrato> listar(@PathVariable String referencia){
+        return service.listarContratosDisponiveisPor(referencia);
+    }
+
+    @RequestMapping(value="/countByCategoria/{nome}", method = RequestMethod.GET)
+    public long countByCategoria(@PathVariable String nome){
+        return repository.countByCategoria(nome);
+    }
 }

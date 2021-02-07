@@ -21,7 +21,7 @@ public class GrupoService {
 
     public List<SelectDTO<Grupo>> listarSelect(){
 
-        var grupos = repository.findAll(Sort.by("categoria.nome").ascending());
+        List<Grupo> grupos = repository.findAll(Sort.by("categoria.nome").ascending());
 
         grupos.stream().sorted(Comparator.comparing(Grupo::getNome)).collect(Collectors.toList());
 

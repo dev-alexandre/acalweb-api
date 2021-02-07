@@ -1,22 +1,32 @@
+server:
+  port: 8080
+
 spring:
   profiles:
-    active: stg
+    active: uat
 
-security:
-  require-ssl=true:
+  data:
+    mongodb:
+      authentication-database: admin
+      username: ${DB_USERNAME:alexandre}
+      password: ${DB_PASSWORD:senha}
+      database: ${DB_DATABASE:acal}
+      port: ${DB_PORT:27017}
+      host: ${DB_HOST:acalv2.com.br}
 
-server:
-  port: 443
-  ssl:
-    enable: true
-    key-alias: acal
-    key-store-type: PKCS12
-    key-store: classpath:keystore/acalcert.p12
-    key-store-password: '9yOwEEH&h%#&'
-  tomcat:
-    remote_ip_header: x-forwarded-for
-    protocol_header: x-forwarded-proto
+#security:
+#  require-ssl=true:
 
-trust:
-  store: classpath:keystore/acalcert.p12
-  password: '9yOwEEH&h%#&'
+  #ssl:
+  #  enable: true
+  #  key-alias: acal
+  #  key-store-type: PKCS12
+  ##  keyStoreType: PKCS12
+  #  key-store: classpath:keystore/acalcert.p12
+  #  key-store-password: '9yOwEEH&h%#&'
+  #tomcat:
+  #  remote_ip_header: x-forwarded-for
+  #  protocol_header: x-forwarded-proto
+#trust:
+#  store: classpath:keystore/acalcert.p12
+#  password: '9yOwEEH&h%#&'

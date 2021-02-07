@@ -1,7 +1,6 @@
 package br.com.acalapi.service;
 
 import br.com.acalapi.entity.Contrato;
-import br.com.acalapi.entity.Referencia;
 import br.com.acalapi.repository.ContratoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,11 +19,11 @@ public class ContratoService {
     @Autowired
     private ContratoRepository repository;
 
-    public List<Contrato> listarContratosDisponiveisPor(Referencia referencia) {
+    public List<Contrato> listarContratosDisponiveisPor(String referencia) {
 
         Query q = new Query();
         q.addCriteria(
-            Criteria.where("habilitado").ne(false).and("refecrencias").nin(referencia)
+            Criteria.where("referencias").nin(referencia).and("habilitado").is(true)
         );
 
         return mongoTemplate.find(q, Contrato.class);

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
@@ -12,11 +13,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-@Document(collection = "grupo")
-public class Grupo extends AE {
+@Document(collection = "hidrometro")
+public class Hidrometro extends AE {
 
-    private String nome;
-    private BigDecimal valor;
-    private BigDecimal valorSocio;
-    private Categoria categoria;
+    private String referencia;
+
+    private String matricula;
+
+    private Integer atual;
+
+    private Integer anterior;
+
+    private BigDecimal valorLitroAgua;
+
 }
