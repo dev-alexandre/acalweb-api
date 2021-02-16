@@ -1,4 +1,4 @@
-package br.com.acalapi.service;
+package br.com.acalapi.service.v1;
 
 import br.com.acalapi.entity.security.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,34 +19,19 @@ public class UserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String nome) throws UsernameNotFoundException {
 
-        if(nome == null || nome.isEmpty() ){
+        if (nome == null || nome.isEmpty()) {
             throw new UsernameNotFoundException("Usuário não encontrado.");
         }
 
         Usuario user =
-            mongoTemplate
-                .findOne(new Query().addCriteria(Criteria.where("email").regex("^" + nome.toLowerCase() + "$")),Usuario.class);
+                mongoTemplate
+                        .findOne(new Query().addCriteria(Criteria.where("email").regex("^" + nome.toLowerCase() + "$")), Usuario.class);
 
-        if(user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("Usuário não encontrado.");
         }
 
         return user;
     }
 
-    public boolean isExists(String nome){
-
-        if(nome == null || nome.isEmpty() ){
-            return false;
-        }
-
-        Usuario user = mongoTemplate
-                .findOne(new Query().addCriteria(Criteria.where("name").regex("^" + nome.toLowerCase() + "$")),Usuario.class);
-
-        if(user == null ){
-            return false;
-        }
-
-        return true;
-    }
 }

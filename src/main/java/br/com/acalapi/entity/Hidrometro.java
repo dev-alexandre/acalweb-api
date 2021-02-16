@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
@@ -26,4 +25,7 @@ public class Hidrometro extends AE {
 
     private BigDecimal valorLitroAgua;
 
+    private Integer litrosGratuidade;
+
+    private BigDecimal valor;
 }

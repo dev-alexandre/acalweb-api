@@ -1,4 +1,4 @@
-package br.com.acalapi.service;
+package br.com.acalapi.service.v1;
 
 import br.com.acalapi.entity.Hidrometro;
 import br.com.acalapi.entity.Matricula;
@@ -30,10 +30,9 @@ public class HidrometroService {
 
         List<Matricula> matriculas = mongoTemplate.find(q, Matricula.class);
 
-        matriculas.forEach(c->{
+        matriculas.forEach(c -> {
             Hidrometro h = new Hidrometro();
             h.setReferencia(referencia);
-            //h.setMatricula(c);
             hidrometros.add(h);
         });
 

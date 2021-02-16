@@ -15,42 +15,31 @@ import java.util.Map;
 @ControllerAdvice
 public class AppAdvice {
 
-    @ExceptionHandler(value = UsernameNotFoundException.class)
-    public ResponseEntity h1(final UsernameNotFoundException exception) {
+    private Map<String, Object> getBody(Exception exception) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("message", "City not found");
+        body.put("message", exception.getMessage());
+        return body;
+    }
 
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(value = UsernameNotFoundException.class)
+    public ResponseEntity<?> h1(final UsernameNotFoundException exception) {
+        return new ResponseEntity<>(getBody(exception), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity h3(final RuntimeException exception) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> h3(final RuntimeException exception) {
+        return new ResponseEntity<>(getBody(exception), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = ConflictDataException.class)
-    public ResponseEntity h2(ConflictDataException exception) {
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMensagem());
-
-        return new ResponseEntity<>(body, exception.getStatus());
+    public ResponseEntity<?> h2(ConflictDataException exception) {
+        return new ResponseEntity<>(getBody(exception), exception.getStatus());
     }
 
     @ExceptionHandler(value = ExpiredJwtException.class)
-    public ResponseEntity h3(ExpiredJwtException exception) {
-
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", exception.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> h3(ExpiredJwtException exception) {
+        return new ResponseEntity<>(getBody(exception), HttpStatus.UNAUTHORIZED);
     }
 
 

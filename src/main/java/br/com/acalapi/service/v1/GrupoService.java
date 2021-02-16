@@ -1,4 +1,4 @@
-package br.com.acalapi.service;
+package br.com.acalapi.service.v1;
 
 import br.com.acalapi.dto.SelectDTO;
 import br.com.acalapi.entity.Grupo;
@@ -19,7 +19,7 @@ public class GrupoService {
     @Autowired
     private GrupoRepository repository;
 
-    public List<SelectDTO<Grupo>> listarSelect(){
+    public List<SelectDTO<Grupo>> listarSelect() {
 
         List<Grupo> grupos = repository.findAll(Sort.by("categoria.nome").ascending());
 
@@ -37,7 +37,7 @@ public class GrupoService {
         temporario.setTitle(CategoriaEnum.TEMPORARIO.getNome());
         temporario.setValues(new ArrayList<>());
 
-        for (Grupo g: grupos) {
+        for (Grupo g : grupos) {
 
             if (g.getCategoria().getNome().equals("Sócio Fundador")) {
                 fundador.getValues().add(g);
@@ -52,15 +52,15 @@ public class GrupoService {
 
         List<SelectDTO<Grupo>> retorno = new ArrayList<>();
 
-        if(!fundador.getValues().isEmpty()){
+        if (!fundador.getValues().isEmpty()) {
             retorno.add(fundador);
         }
 
-        if(!efetivo.getValues().isEmpty()){
+        if (!efetivo.getValues().isEmpty()) {
             retorno.add(efetivo);
         }
 
-        if(!temporario.getValues().isEmpty()){
+        if (!temporario.getValues().isEmpty()) {
             retorno.add(temporario);
         }
 

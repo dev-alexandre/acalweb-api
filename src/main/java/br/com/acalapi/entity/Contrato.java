@@ -1,14 +1,12 @@
 package br.com.acalapi.entity;
 
-import br.com.acalapi.entity.security.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -16,7 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Document(collection = "contrato")
-public class Contrato extends AE{
+public class Contrato extends AE {
+
+    @Transient
+    public static final String SEQUENCE_NAME = "contrato_sequence";
+
+    private Long numero;
 
     private Cliente cliente;
 

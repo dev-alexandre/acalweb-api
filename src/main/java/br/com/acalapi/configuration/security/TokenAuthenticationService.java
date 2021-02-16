@@ -6,7 +6,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultJwtParser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -28,26 +27,29 @@ public class TokenAuthenticationService {
     private static final String TOKEN_PREFIX = "Bearer";
     private static final String HEADER_STRING = "Authorization";
 
+    private TokenAuthenticationService() {
+    }
+
     public static void addAuthentication(HttpServletResponse response, Authentication auth) {
 
         Usuario usuario = (Usuario) auth.getPrincipal();
 
         JwtBuilder jwt = Jwts.builder()
-            .setSubject(auth.getName())
-            .claim("role", auth.getAuthorities())
-            .claim("title", usuario.getTitle())
-            .claim("name", usuario.getName())
-            .claim("key", usuario.getId())
-            .claim("id", usuario.getId())
-            .setExpiration(
-                Date.from(LocalDateTime.now().plusHours(HOURS_TO_EXPIRATION).atZone(ZoneId.systemDefault()).toInstant())
-            )
-            .signWith(SignatureAlgorithm.HS512,
-                new SecretKeySpec(
-                    DatatypeConverter.parseBase64Binary(SECRET),
-                    SignatureAlgorithm.HS512.getJcaName()
+                .setSubject(auth.getName())
+                .claim("role", auth.getAuthorities())
+                .claim("title", usuario.getTitle())
+                .claim("name", usuario.getName())
+                .claim("key", usuario.getId())
+                .claim("id", usuario.getId())
+                .setExpiration(
+                        Date.from(LocalDateTime.now().plusHours(HOURS_TO_EXPIRATION).atZone(ZoneId.systemDefault()).toInstant())
                 )
-            );
+                .signWith(SignatureAlgorithm.HS512,
+                        new SecretKeySpec(
+                                DatatypeConverter.parseBase64Binary(SECRET),
+                                SignatureAlgorithm.HS512.getJcaName()
+                        )
+                );
 
         String token = jwt.compact();
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + token);
@@ -70,7 +72,7 @@ public class TokenAuthenticationService {
     public static Authentication getAuthentication(HttpServletRequest request) throws ExpiredJwtException {
         String token = request.getHeader(HEADER_STRING);
 
-        try{
+        try {
 
             if (token != null) {
                 String user = Jwts.parser()
@@ -84,7 +86,7 @@ public class TokenAuthenticationService {
                 }
             }
 
-        } catch (IllegalArgumentException| ExpiredJwtException e){
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
             throw new RuntimeException("É você não possui permissão");
         }
 

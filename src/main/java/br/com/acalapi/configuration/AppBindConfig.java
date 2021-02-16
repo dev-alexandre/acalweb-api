@@ -10,17 +10,17 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class AppBindConfig {
- 
-    private static final String localDateFormat = "ddMMyyyy";
-    private static final String localDateTimeFormat = "ddMMyyyyHHmmss";
- 
+
+    private static final String LocalDateFormat = "ddMMyyyy";
+    private static final String LocalDateTimeFormat = "ddMMyyyyHHmmss";
+
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {
         return builder -> {
-            builder.simpleDateFormat(localDateFormat);
-            builder.serializers(new LocalDateSerializer(DateTimeFormatter.ofPattern(localDateFormat)));
-            builder.serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(localDateTimeFormat)));
+            builder.simpleDateFormat(LocalDateFormat);
+            builder.serializers(new LocalDateSerializer(DateTimeFormatter.ofPattern(LocalDateFormat)));
+            builder.serializers(new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(LocalDateTimeFormat)));
         };
     }
- 
+
 }

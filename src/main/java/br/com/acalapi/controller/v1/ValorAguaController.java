@@ -1,7 +1,8 @@
-package br.com.acalapi.controller;
+package br.com.acalapi.controller.v1;
 
-import br.com.acalapi.controller.filtro.Filtro;
+import br.com.acalapi.controller.Controller;
 import br.com.acalapi.entity.ValorAgua;
+import br.com.acalapi.filtro.v2.Filtro;
 import br.com.acalapi.repository.ValorAguaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/valor-agua")
-public class ValorAguaController extends Controller<ValorAgua, Filtro>{
+public class ValorAguaController extends Controller<ValorAgua, Filtro> {
 
     @Autowired
     private ValorAguaRepository repository;
@@ -31,7 +32,7 @@ public class ValorAguaController extends Controller<ValorAgua, Filtro>{
         return null;
     }
 
-    @RequestMapping(value="/buscar/atual", method = RequestMethod.GET)
+    @RequestMapping(value = "/buscar/atual", method = RequestMethod.GET)
     public ValorAgua buscarAtual() {
         return repository.findTopByOrderByDataDesc();
     }

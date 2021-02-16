@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -19,12 +20,16 @@ import java.time.LocalDate;
 @Document(collection = "pagamento")
 public class Pagamento extends AE {
 
+    @NotNull
     private String motivo;
 
+    @NotNull
     private BigDecimal valor;
 
+    @NotNull
     private Usuario responsavel;
 
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyy")
     private LocalDate criacao;
 

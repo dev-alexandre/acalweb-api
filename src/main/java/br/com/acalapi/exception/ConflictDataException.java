@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class ConflictDataException extends RuntimeException{
+public class ConflictDataException extends RuntimeException {
 
     private final String mensagem;
     private final HttpStatus status;

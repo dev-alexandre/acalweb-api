@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Document(collection = "valorAgua")
-public class ValorAgua  extends AE {
+public class ValorAgua extends AE {
 
     private String valor;
     private LocalDateTime data;

@@ -1,7 +1,8 @@
-package br.com.acalapi.controller;
+package br.com.acalapi.controller.v1;
 
-import br.com.acalapi.controller.filtro.Filtro;
+import br.com.acalapi.controller.Controller;
 import br.com.acalapi.entity.Analise;
+import br.com.acalapi.filtro.v2.Filtro;
 import br.com.acalapi.repository.AnaliseRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Api
 @RestController
 @RequestMapping("/analise")
-public class AnaliseController extends Controller<Analise, Filtro>{
+public class AnaliseController extends Controller<Analise, Filtro> {
 
     @Autowired
     private AnaliseRepository repository;
@@ -27,7 +28,7 @@ public class AnaliseController extends Controller<Analise, Filtro>{
     @Override
     public Sort getSort() {
         return
-            Sort.by("referenciaInicial", "referenciaFim");
+                Sort.by("referenciaInicial", "referenciaFim");
     }
 
     @Override
@@ -36,17 +37,17 @@ public class AnaliseController extends Controller<Analise, Filtro>{
     }
 
 
-    @RequestMapping(value="/buscarPorReferencia/{referencia}", method = RequestMethod.GET)
-    public Analise buscarPorReferencia(@PathVariable String referencia){
+    @RequestMapping(value = "/buscarPorReferencia/{referencia}", method = RequestMethod.GET)
+    public Analise buscarPorReferencia(@PathVariable String referencia) {
         return
-            repository.findByReferencia(referencia);
+                repository.findByReferencia(referencia);
     }
 
     @Override
     public Query getQueryDuplicidade(Analise analise) {
         return new Query().addCriteria(
-            Criteria
-                .where("referencia").is(analise.getReferencia())
+                Criteria
+                        .where("referencia").is(analise.getReferencia())
         );
     }
 

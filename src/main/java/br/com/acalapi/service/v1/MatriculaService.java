@@ -1,4 +1,4 @@
-package br.com.acalapi.service;
+package br.com.acalapi.service.v1;
 
 import br.com.acalapi.dto.SelectDTO;
 import br.com.acalapi.entity.Matricula;
@@ -28,26 +28,26 @@ public class MatriculaService {
 
     public List<Matricula> listarPorReferencia(String referencia) {
         Criteria criteria =
-            new Criteria()
-                .where("hidrometros.referencia").nin(referencia).and("possuiHidrometro").is(true);
+                new Criteria()
+                        .where("hidrometros.referencia").nin(referencia).and("possuiHidrometro").is(true);
 
         return mongoOperations.find(new Query().addCriteria(criteria), Matricula.class);
     }
 
-    public List<SelectDTO<Matricula>> listarSelect(String name){
+    public List<SelectDTO<Matricula>> listarSelect(String name) {
 
         Criteria criteria = new Criteria();
         criteria.orOperator(
-            Criteria.where("logradouro.nome").regex(".*"+ name +".*", "i"),
-            Criteria.where("logradouro.tipoLogradouro.nome").regex(".*"+ name +".*", "i")
+                Criteria.where("logradouro.nome").regex(".*" + name + ".*", "i"),
+                Criteria.where("logradouro.tipoLogradouro.nome").regex(".*" + name + ".*", "i")
         );
 
         List<Matricula> matriculas = mongoOperations.find(new Query().limit(5).addCriteria(criteria), Matricula.class);
         List<SelectDTO<Matricula>> dados = new ArrayList<>();
         List<String> nomes = new ArrayList<>();
 
-        for (Matricula m: matriculas) {
-            if(!nomes.contains(m.getLogradouro().getTipoLogradouro().getNome())){
+        for (Matricula m : matriculas) {
+            if (!nomes.contains(m.getLogradouro().getTipoLogradouro().getNome())) {
                 nomes.add(m.getLogradouro().getTipoLogradouro().getNome());
 
                 SelectDTO<Matricula> d = new SelectDTO<>();
@@ -56,9 +56,9 @@ public class MatriculaService {
             }
         }
 
-        for (SelectDTO<Matricula> d: dados) {
+        for (SelectDTO<Matricula> d : dados) {
 
-            if(d.getValues() == null){
+            if (d.getValues() == null) {
                 d.setValues(new ArrayList<>());
             }
 

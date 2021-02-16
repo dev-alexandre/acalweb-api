@@ -1,4 +1,4 @@
-package br.com.acalapi.service;
+package br.com.acalapi.service.v1;
 
 import br.com.acalapi.entity.Contrato;
 import br.com.acalapi.repository.ContratoRepository;
@@ -23,7 +23,7 @@ public class ContratoService {
 
         Query q = new Query();
         q.addCriteria(
-            Criteria.where("referencias").nin(referencia).and("habilitado").is(true)
+                Criteria.where("referencias").nin(referencia).and("habilitado").is(true)
         );
 
         return mongoTemplate.find(q, Contrato.class);

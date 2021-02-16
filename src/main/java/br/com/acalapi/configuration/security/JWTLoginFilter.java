@@ -18,26 +18,26 @@ import java.io.IOException;
 
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
-	public JWTLoginFilter(String url, AuthenticationManager authManager) {
-		super(new AntPathRequestMatcher(url));
-		setAuthenticationManager(authManager);
-	}
+    public JWTLoginFilter(String url, AuthenticationManager authManager) {
+        super(new AntPathRequestMatcher(url));
+        setAuthenticationManager(authManager);
+    }
 
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-		Usuario credentials = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
-	
-		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-			credentials.getUsername(),
-			credentials.getPassword(),
-			credentials.getAuthorities()
-		);
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        Usuario credentials = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
 
-		return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
-	}
-	
-	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication auth) throws IOException, ServletException {
-		TokenAuthenticationService.addAuthentication(response, auth);
-	}
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                credentials.getUsername(),
+                credentials.getPassword(),
+                credentials.getAuthorities()
+        );
+
+        return getAuthenticationManager().authenticate(usernamePasswordAuthenticationToken);
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication auth) throws IOException, ServletException {
+        TokenAuthenticationService.addAuthentication(response, auth);
+    }
 }

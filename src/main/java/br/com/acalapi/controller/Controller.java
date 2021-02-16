@@ -1,8 +1,8 @@
 package br.com.acalapi.controller;
 
-import br.com.acalapi.controller.filtro.Filtro;
 import br.com.acalapi.entity.AE;
 import br.com.acalapi.exception.ConflictDataException;
+import br.com.acalapi.filtro.v2.Filtro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,93 +29,91 @@ public abstract class Controller<T extends AE, F extends Filtro> {
     protected MongoTemplate mongoOperations;
 
     public abstract MongoRepository getRepository();
+    public abstract Query getQueryDuplicidade(T t);
 
     private final Class<T> persistentClass;
 
-    @SuppressWarnings("unchecked")
     public Controller() {
         Type type = ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         persistentClass = (Class<T>) type;
     }
 
-    @RequestMapping(value="/salvar-todos", method = RequestMethod.POST)
-    public void salvar(@RequestBody List<T> ts){
-        ts.forEach(t -> {
-            verificarDuplicidade(t);
-        });
 
+    @RequestMapping(value = "/salvar-todos", method = RequestMethod.POST)
+    public void salvar(@RequestBody List<T> ts) {
+        ts.forEach(this::verificarDuplicidade);
         getRepository().saveAll(ts);
     }
 
-    @RequestMapping(value="/salvar", method = RequestMethod.POST)
-    public void salvar(@RequestBody T t){
+    @RequestMapping(value = "/salvar", method = RequestMethod.POST)
+    public void salvar(@RequestBody T t) {
         verificarDuplicidade(t);
         getRepository().save(t);
     }
 
-    @RequestMapping(value="/editar", method = RequestMethod.PUT)
-    public void editar(@RequestBody T t){
+    @RequestMapping(value = "/editar", method = RequestMethod.PUT)
+    public void editar(@RequestBody T t) {
         verificarDuplicidade(t);
         getRepository().save(t);
     }
 
-    public void verificarDuplicidade(T novo){
-        if(novo == null  ){
-            throw new ConflictDataException( "Essa solicitação não pode ser processada", HttpStatus.BAD_REQUEST);
+    public void verificarDuplicidade(T novo) {
+        if (novo == null) {
+            throw new ConflictDataException("Essa solicitação não pode ser processada", HttpStatus.BAD_REQUEST);
         }
 
-        if(getQueryDuplicidade(novo)== null){
+        if (getQueryDuplicidade(novo) == null) {
             return;
         }
 
         Query query = getQueryDuplicidade(novo);
-        T antigo = mongoOperations.findOne(query, persistentClass);;
+        T antigo = mongoOperations.findOne(query, persistentClass);
+        ;
 
-        if(antigo == null){
+        if (antigo == null) {
             return;
         }
 
-        if(novo.getId() == null){
-            if(antigo != null){
+        if (novo.getId() == null) {
+            if (antigo != null) {
                 throw new ConflictDataException(this.persistentClass.getSimpleName() + " já cadastrado", HttpStatus.CONFLICT);
             }
         } else {
-            if(!novo.getId().equals(antigo.getId())){
+            if (!novo.getId().equals(antigo.getId())) {
                 throw new ConflictDataException(this.persistentClass.getSimpleName() + " já cadastrado", HttpStatus.CONFLICT);
             }
         }
     }
 
-    @RequestMapping(value="/deletar/{id}", method = RequestMethod.DELETE)
-    public void deletar(@PathVariable String id){
-       getRepository().deleteById(id);
+    @RequestMapping(value = "/deletar/{id}", method = RequestMethod.DELETE)
+    public void deletar(@PathVariable String id) {
+        getRepository().deleteById(id);
     }
 
-    @RequestMapping(value="/listar", method = RequestMethod.GET)
-    public List<T> listar(){
+    @RequestMapping(value = "/listar", method = RequestMethod.GET)
+    public List<T> listar() {
         return getRepository().findAll(getSort());
     }
 
 
-    @RequestMapping(value="/buscar/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/buscar/{id}", method = RequestMethod.GET)
     public T buscar(@PathVariable String id) {
         return mongoOperations.findById(id, persistentClass);
     }
 
-    @RequestMapping(value="/paginar", method = RequestMethod.POST)
+    @RequestMapping(value = "/paginar", method = RequestMethod.POST)
     public Page<T> paginar(@RequestBody F pf) {
 
         Pageable pageable = getPageable(pf);
         Query query = getQuery(pageable, pf);
 
         return
-            PageableExecutionUtils.getPage(
-                mongoOperations.find(query, persistentClass),
-                pageable,
-                () -> mongoOperations.count(Query.of(query).limit(-1).skip(-1), persistentClass));
+                PageableExecutionUtils.getPage(
+                        mongoOperations.find(query, persistentClass),
+                        pageable,
+                        () -> mongoOperations.count(Query.of(query).limit(-1).skip(-1), persistentClass));
     }
 
-    @RequestMapping(value="paginar", method = RequestMethod.GET)
     public Page<T> paginar() {
 
         F filtro = (F) new Filtro();
@@ -124,34 +122,35 @@ public abstract class Controller<T extends AE, F extends Filtro> {
 
 
         return
-            PageableExecutionUtils.getPage(
-                mongoOperations.find(query, persistentClass),
-                pageable,
-                () -> mongoOperations.count(Query.of(query).limit(-1).skip(-1), persistentClass));
+                PageableExecutionUtils.getPage(
+                        mongoOperations.find(query, persistentClass),
+                        pageable,
+                        () -> mongoOperations.count(Query.of(query).limit(-1).skip(-1), persistentClass));
     }
+    @RequestMapping(value = "paginar", method = RequestMethod.GET)
 
-    public Query getQuery(Pageable pageable, Filtro filtro){
+    public Query getQuery(Pageable pageable, Filtro filtro) {
 
-        if(filtro.getAtivo() != null){
+        if (filtro.isAtivo()) {
             return new Query()
                 .addCriteria(
                     new Criteria().orOperator(
                         Criteria.where("ativo").is(true),
                         Criteria.where("ativo").is(null)
-                    )
+                )
             ).with(pageable);
         }
 
         return new Query().with(pageable);
     }
 
-    public Pageable getPageable(F pf){
+    public Pageable getPageable(F pf) {
         Sort sort = getSort();
 
-        if(sort==null) {
+        if (sort == null) {
             return PageRequest.of(pf.getPage(), pf.getSize());
         } else {
-            return PageRequest.of(pf.getPage(), pf.getSize(),sort);
+            return PageRequest.of(pf.getPage(), pf.getSize(), sort);
         }
     }
 
@@ -163,9 +162,8 @@ public abstract class Controller<T extends AE, F extends Filtro> {
         return null;
     }
 
-    public Query getQueryName(Pageable pageable, Filtro filtro){
+    public Query getQueryName(Pageable pageable, Filtro filtro) {
         return new Query().with(pageable);
     }
 
-    public abstract Query getQueryDuplicidade(T t);
 }
