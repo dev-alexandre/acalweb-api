@@ -2,7 +2,7 @@ package br.com.acalapi.service.v1;
 
 import br.com.acalapi.entity.Hidrometro;
 import br.com.acalapi.entity.Matricula;
-import br.com.acalapi.repository.MatriculaRepository;
+import br.com.acalapi.repository.v2.MatriculaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

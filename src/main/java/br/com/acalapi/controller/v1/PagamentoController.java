@@ -3,7 +3,7 @@ package br.com.acalapi.controller.v1;
 import br.com.acalapi.controller.Controller;
 import br.com.acalapi.entity.financeiro.Pagamento;
 import br.com.acalapi.filtro.v2.Filtro;
-import br.com.acalapi.repository.PagamentoRepository;
+import br.com.acalapi.repository.v1.PagamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;

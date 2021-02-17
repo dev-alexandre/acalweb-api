@@ -1,7 +1,7 @@
 package br.com.acalapi.service.v1;
 
 import br.com.acalapi.entity.sequence.DatabaseSequence;
-import br.com.acalapi.repository.ContratoRepository;
+import br.com.acalapi.repository.v2.ContratoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

@@ -1,7 +1,6 @@
 package br.com.acalapi.repository.v2;
 
 import br.com.acalapi.entity.Cliente;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -11,4 +10,9 @@ public interface ClienteRepository extends PagingAndSortingRepository<Cliente, S
 
     @Query("{ 'nome':{ $regex:?0, $options: 'i' } }")
     List<Cliente> findByname(String nome);
+
+    boolean existsByDocumento(String documento);
+
+    Cliente findByDocumento(String documento);
+
 }

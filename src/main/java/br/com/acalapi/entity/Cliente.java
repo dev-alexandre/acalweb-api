@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data
@@ -16,9 +18,14 @@ import java.time.LocalDate;
 @Document(collection = "cliente")
 public class Cliente extends AE {
 
+    @Indexed
     private String nome;
-    private String telefone;
+
+    @Indexed
+    @NotNull
     private String documento;
+
+    private String telefone;
     private String socio;
     private String letra;
 

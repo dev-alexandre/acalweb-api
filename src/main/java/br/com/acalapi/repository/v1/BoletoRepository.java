@@ -1,4 +1,4 @@
-package br.com.acalapi.repository;
+package br.com.acalapi.repository.v1;
 
 import br.com.acalapi.entity.financeiro.Boleto;
 import org.springframework.data.mongodb.repository.MongoRepository;

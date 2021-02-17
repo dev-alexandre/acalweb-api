@@ -2,7 +2,7 @@ package br.com.acalapi.controller.v1;
 
 import br.com.acalapi.entity.security.Funcao;
 import br.com.acalapi.entity.security.Usuario;
-import br.com.acalapi.repository.UsuarioRepository;
+import br.com.acalapi.repository.v1.UsuarioRepository;
 import br.com.acalapi.service.v1.UserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

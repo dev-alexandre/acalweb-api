@@ -13,4 +13,7 @@ public interface LogradouroRepository extends PagingAndSortingRepository<Logrado
     @Query("{ 'nome':{ $regex:?0, $options: 'i' }, 'tipoLogradouro':?1  }")
     List<Logradouro> findByNomeAndTipoLogradouro(String nome, TipoLogradouro tipoLogradouro);
 
+    @Query("{ 'nome':{ $regex:?0, $options: 'i' }, 'tipoLogradouro.nome':{ $regex:?0, $options: 'i' }  }")
+    boolean existsByNomeAndTipoLogradouro(String nome, TipoLogradouro tipoLogradouro);
+
 }

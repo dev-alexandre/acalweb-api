@@ -13,36 +13,53 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 
+import javax.xml.bind.Element;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class ServiceV2<T extends AE, F extends Filtro> {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final String ATIVO = "ativo";
+
     @Autowired
     protected MongoTemplate mongoOperations;
 
     public abstract Query getQuery(F filtro, Query query);
-    public abstract PagingAndSortingRepository getRepository();
+    public abstract PagingAndSortingRepository<T, String> getRepository();
 
     private final Class<T> persistentClass;
-    private final Class<F> filterClass;
 
-    public ServiceV2() {
+    protected ServiceV2() {
         persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        filterClass = (Class<F>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
+
+    public List<T> listar(F filtro){
+        filtro = iniciarFiltro(filtro);
+        Query query = new Query();
+
+        filterAtivo(filtro, query);
+        getQuery(filtro, query);
+
+        Sort sort = ordenarLista(filtro);
+        query.with(sort);
+
+        return mongoOperations.find( query , persistentClass);
+    }
+
+
 
     public Page<T> paginar(F filtro) {
 
         filtro = iniciarFiltro(filtro);
         Pageable pageable = getPageable(filtro);
-        Query query = new Query();
+        Query query = new Query().with(pageable);
 
         filterAtivo(filtro, query);
         getQuery(filtro, query);
@@ -51,13 +68,14 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
     }
 
     public Page<T> paginar(int offset, int limit){
-        Filtro filtro = new Filtro();
 
         Pageable pageable = PageRequest.of(offset, limit);
-        Query query = new Query();
+        Query query = new Query().with(pageable);
 
         return paginar(pageable, query);
     }
+
+
 
     private Page<T> paginar(Pageable pageable, Query query){
         return
@@ -79,41 +97,83 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
         if (filtro.isAtivo()) {
             query.addCriteria(
                 new Criteria().orOperator(
-                    Criteria.where("ativo").is(true),
-                    Criteria.where("ativo").is(null)
+                    Criteria.where(ATIVO).is(true),
+                    Criteria.where(ATIVO).is(null)
                 )
             );
         } else {
             query.addCriteria(
-                Criteria.where("ativo").is(false)
+                Criteria.where(ATIVO).is(false)
             );
         }
     }
 
-    private Pageable getPageable(F filtro) {
-        Sort sort = null;
+    public Sort ordenarLista(F filtro){
+        Sort.Direction direction = Sort.Direction.ASC;
+        List<ElementoFiltro> orders= new ArrayList<>();
 
-        String sortName = "";
+        for(Field field : filtro.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+
+                ElementoFiltro el = (ElementoFiltro) field.get(filtro);
+                if(el != null){
+
+                    if (el.getAsc() != null && !el.getAsc()) {
+                        direction = Sort.Direction.DESC;
+                    }
+
+                    if(el.getOrder() != null){
+                        orders.add(el);
+                    }
+
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
+        orders.sort(Comparator.comparing(ElementoFiltro::getPrioridade));
+
+        if(orders.size() == 0){
+            return Sort.by(Sort.Direction.ASC, "id");
+        }
+
+        String[] stringOrders = new String[orders.size()];
+
+        for(int x=0; x< orders.size(); x++){
+            stringOrders[x] = orders.get(x).getOrder();
+        }
+
+
+        return Sort.by(direction, stringOrders);
+    }
+
+    private Pageable getPageable(F filtro) {
         Sort.Direction direction;
 
         for(Field field : filtro.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
 
-                Object el = field.get(filtro);
+                ElementoFiltro el = (ElementoFiltro) field.get(filtro);
                 if(el instanceof ElementoFiltro){
-                    Boolean direcao = ((ElementoFiltro) el).getAsc();
-                    String nameFiled = field.getName();
+                    Boolean direcao = el.getAsc();
+
+                    String order = el.getOrder();
+
+                    if(order == null){
+                        order = field.getName();
+                    }
 
                     if(direcao != null){
-                        sortName = nameFiled;
                         if(direcao){
                             direction = Sort.Direction.ASC;
                         }else {
                             direction = Sort.Direction.DESC;
                         }
 
-                        return PageRequest.of(filtro.getPage(), filtro.getSize(), Sort.by("nome").descending());
+                        return PageRequest.of(filtro.getPage(), filtro.getSize(), Sort.by(direction, order));
                     }
                 }
             } catch (IllegalAccessException e) {
@@ -136,23 +196,28 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
 
     public void salvar(T t){
         logger.info("dado salvo", t);
+        verificarSalvar(t);
         getRepository().save(t);
     }
 
-    public void salvar(List<T> t){
-        logger.info("dados salvos", t);
-        getRepository().save(t);
+    public void salvar(List<T> ts){
+        ts.forEach(t -> verificarSalvar(t));
+
+       // getRepository().save(ts);
     }
 
     public void editar(T t){
         logger.info("dado editado", t);
+        verificarEditar(t);
         getRepository().save(t);
     }
 
     public T buscar(String id){
         logger.info("buscar", id);
-        return (T) getRepository().findById(id).orElse(null);
+        return getRepository().findById(id).orElse(null);
     }
 
+    public void verificarSalvar(T t){ }
+    public void verificarEditar(T t){ }
 
 }

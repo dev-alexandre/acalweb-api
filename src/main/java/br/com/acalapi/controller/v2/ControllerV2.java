@@ -30,6 +30,11 @@ public abstract class ControllerV2<T extends AE, F extends Filtro> {
         return getService().listarTodos();
     }
 
+    @RequestMapping(value = "/listar", method = RequestMethod.POST)
+    public List<T> listar(@RequestBody F f) {
+        return getService().listar(f);
+    }
+
     @RequestMapping(value = "/deletar/{id}", method = RequestMethod.DELETE)
     public void deletar(@PathVariable String id) {
         getService().deletar(id);

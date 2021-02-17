@@ -3,7 +3,7 @@ package br.com.acalapi.controller.v1;
 import br.com.acalapi.controller.Controller;
 import br.com.acalapi.entity.Hidrometro;
 import br.com.acalapi.filtro.v2.Filtro;
-import br.com.acalapi.repository.HidrometroRepository;
+import br.com.acalapi.repository.v1.HidrometroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -7,11 +7,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class ClienteFiltro extends Filtro {
+public class ContratoFiltro extends Filtro {
 
     private ElementoFiltro nome;
-    private ElementoFiltro documento;
-    private ElementoFiltro socio;
-    private ElementoFiltro letra;
+    private ElementoFiltro matricula;
+    private ElementoFiltro principal;
+    private ElementoFiltro grupo;
+    private ElementoFiltro valor;
 
 }

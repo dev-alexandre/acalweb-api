@@ -3,7 +3,7 @@ package br.com.acalapi.controller.v1;
 import br.com.acalapi.controller.Controller;
 import br.com.acalapi.entity.Analise;
 import br.com.acalapi.filtro.v2.Filtro;
-import br.com.acalapi.repository.AnaliseRepository;
+import br.com.acalapi.repository.v1.AnaliseRepository;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;

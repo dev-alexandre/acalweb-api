@@ -1,4 +1,4 @@
-package br.com.acalapi.repository;
+package br.com.acalapi.repository.v1;
 
 import br.com.acalapi.entity.Analise;
 import org.springframework.data.mongodb.repository.MongoRepository;
