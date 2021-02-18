@@ -83,7 +83,6 @@ public class GrupoService extends ServiceV2<Grupo, GrupoFiltro> {
     @Override
     public void verificarSalvar(Grupo grupo) {
         Query query = new Query();
-
         query.addCriteria(
             Criteria
                 .where("categoria.nome").is(grupo.getCategoria().getNome())
@@ -93,23 +92,26 @@ public class GrupoService extends ServiceV2<Grupo, GrupoFiltro> {
         if(mongoOperations.exists(query, Grupo.class)){
             throw new ConflictDataException("Esse grupo já está cadastrado", HttpStatus.CONFLICT);
         }
-
     }
 
     @Override
-    public void verificarEditar(Grupo novo) {
+    public void verificarEditar(Grupo atual) {
         Query query = new Query();
 
         query.addCriteria(
             Criteria
-                .where("categoria.nome").is(novo.getCategoria().getNome())
-                .and("nome").is(novo.getNome())
+                .where("categoria.nome").is(atual.getCategoria().getNome())
+                .and("nome").is(atual.getNome())
         );
 
-        Grupo anterior =  mongoOperations.findOne(query, Grupo.class);
-        if(!anterior.getId().equals(novo.getId())){
-            throw new ConflictDataException("Esse grupo já está cadastrado", HttpStatus.CONFLICT);
-        }
+        List<Grupo> anteriores = mongoOperations.find(query, Grupo.class);
+        anteriores.forEach(anterior -> {
+            if(anterior.getId().equals(atual.getId())){
+                return;
+            } else {
+                throw new ConflictDataException("Esse Grupo já está cadastrado", HttpStatus.CONFLICT);
+            }
+        });
 
     }
 

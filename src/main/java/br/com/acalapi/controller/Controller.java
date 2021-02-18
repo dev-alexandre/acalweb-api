@@ -1,6 +1,7 @@
 package br.com.acalapi.controller;
 
 import br.com.acalapi.entity.AE;
+import br.com.acalapi.enumeration.constante.CheckboxEnum;
 import br.com.acalapi.exception.ConflictDataException;
 import br.com.acalapi.filtro.v2.Filtro;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public abstract class Controller<T extends AE, F extends Filtro> {
 
     public abstract MongoRepository getRepository();
     public abstract Query getQueryDuplicidade(T t);
+
+    private final String ATIVO = "ativo";
 
     private final Class<T> persistentClass;
 
@@ -131,14 +134,22 @@ public abstract class Controller<T extends AE, F extends Filtro> {
 
     public Query getQuery(Pageable pageable, Filtro filtro) {
 
-        if (filtro.isAtivo()) {
-            return new Query()
-                .addCriteria(
-                    new Criteria().orOperator(
-                        Criteria.where("ativo").is(true),
-                        Criteria.where("ativo").is(null)
-                )
-            ).with(pageable);
+        if (filtro.getAtivo().getValor() != null) {
+            Query query = new Query().with(pageable);
+
+            if(filtro.getAtivo().getValor().equals(CheckboxEnum.SIM.getValor())){
+                query = new Query()
+                    .addCriteria(
+                        new Criteria().orOperator(
+                            Criteria.where(ATIVO).is(true),
+                            Criteria.where(ATIVO).is(null)
+                        )
+                    ).with(pageable);
+            } else if (filtro.getAtivo().getValor().equals(CheckboxEnum.NAO.getValor())){
+                query = new Query().addCriteria(Criteria.where(ATIVO).is(false)).with(pageable);
+            }
+
+            return query;
         }
 
         return new Query().with(pageable);

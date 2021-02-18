@@ -18,7 +18,11 @@ public class Grupo extends AE {
 
     @Indexed
     private String nome;
+
+    @Indexed
     private BigDecimal valor;
+
+    @Indexed
     private BigDecimal valorSocio;
     private Categoria categoria;
 }

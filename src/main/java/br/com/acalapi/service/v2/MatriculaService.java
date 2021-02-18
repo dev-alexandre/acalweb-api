@@ -105,20 +105,14 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
             );
         }
 
-        if(atual.getHidrometro() != null){
-            query.addCriteria(
-                Criteria.where("hidrometro").is(atual.getHidrometro())
-            );
-        }
-
-        Matricula anterior = (Matricula) mongoOperations.find(query, Matricula.class);
-
-        if(anterior.getId().equals(atual.getId())){
-            return;
-        } else {
-            throw new ConflictDataException("Esse documento já está cadastrado", HttpStatus.CONFLICT);
-        }
-
+        List<Matricula> anteriores =  mongoOperations.find(query, Matricula.class);
+        anteriores.forEach(anterior -> {
+            if(anterior.getId().equals(atual.getId())){
+                return;
+            } else {
+                throw new ConflictDataException("Esse matricula já está cadastrado", HttpStatus.CONFLICT);
+            }
+        });
     }
 
     @Override
@@ -136,12 +130,6 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
         if(matricula.getLetra() != null){
             query.addCriteria(
                 Criteria.where("letra").is(matricula.getLetra())
-            );
-        }
-
-        if(matricula.getHidrometro() != null){
-            query.addCriteria(
-                Criteria.where("hidrometro").is(matricula.getHidrometro())
             );
         }
 

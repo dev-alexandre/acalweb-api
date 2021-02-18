@@ -7,12 +7,12 @@ public class Filtro {
 
     private int size;
     private int page;
-    private boolean ativo;
+    private ElementoFiltro ativo;
 
     public Filtro() {
         this.size = 10;
         this.page = 0;
-        this.ativo = true;
     }
+
 
 }

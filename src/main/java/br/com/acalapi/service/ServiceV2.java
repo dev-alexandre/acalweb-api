@@ -1,6 +1,7 @@
 package br.com.acalapi.service;
 
 import br.com.acalapi.entity.AE;
+import br.com.acalapi.enumeration.constante.CheckboxEnum;
 import br.com.acalapi.filtro.v2.ElementoFiltro;
 import br.com.acalapi.filtro.v2.Filtro;
 import org.slf4j.Logger;
@@ -16,10 +17,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 
-import javax.xml.bind.Element;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -94,21 +95,27 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
     }
 
     private void filterAtivo(F filtro, Query query) {
-        if (filtro.isAtivo()) {
-            query.addCriteria(
-                new Criteria().orOperator(
-                    Criteria.where(ATIVO).is(true),
-                    Criteria.where(ATIVO).is(null)
-                )
-            );
-        } else {
-            query.addCriteria(
-                Criteria.where(ATIVO).is(false)
-            );
+
+        if(filtro != null && filtro.getAtivo()!= null) {
+            if (filtro.getAtivo().getValor() != null) {
+
+                if (filtro.getAtivo().getValor().equals(CheckboxEnum.SIM.getValor())) {
+                    query.addCriteria(
+                            new Criteria().orOperator(
+                                    Criteria.where(ATIVO).is(true),
+                                    Criteria.where(ATIVO).is(null)
+                            )
+                    );
+                } else if (filtro.getAtivo().getValor().equals(CheckboxEnum.NAO.getValor())) {
+                    query.addCriteria(
+                            Criteria.where(ATIVO).is(false)
+                    );
+                }
+            }
         }
     }
 
-    public Sort ordenarLista(F filtro){
+    public Sort ordenarLista(F filtro) {
         Sort.Direction direction = Sort.Direction.ASC;
         List<ElementoFiltro> orders= new ArrayList<>();
 
@@ -134,54 +141,66 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
         }
 
         orders.sort(Comparator.comparing(ElementoFiltro::getPrioridade));
-
         if(orders.size() == 0){
             return Sort.by(Sort.Direction.ASC, "id");
         }
-
-        String[] stringOrders = new String[orders.size()];
-
-        for(int x=0; x< orders.size(); x++){
-            stringOrders[x] = orders.get(x).getOrder();
-        }
-
+        String[] stringOrders =  concat(orders);
 
         return Sort.by(direction, stringOrders);
     }
 
     private Pageable getPageable(F filtro) {
-        Sort.Direction direction;
+        Sort sort;
+        Sort.Direction direction = Sort.Direction.ASC;
+        List<ElementoFiltro> orders = new ArrayList<>();
 
         for(Field field : filtro.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
 
                 ElementoFiltro el = (ElementoFiltro) field.get(filtro);
-                if(el instanceof ElementoFiltro){
-                    Boolean direcao = el.getAsc();
+                if(el != null){
 
-                    String order = el.getOrder();
-
-                    if(order == null){
-                        order = field.getName();
+                    if (el.getAsc() != null && !el.getAsc()) {
+                        direction = Sort.Direction.DESC;
                     }
 
-                    if(direcao != null){
-                        if(direcao){
-                            direction = Sort.Direction.ASC;
-                        }else {
-                            direction = Sort.Direction.DESC;
-                        }
-
-                        return PageRequest.of(filtro.getPage(), filtro.getSize(), Sort.by(direction, order));
+                    if(el.getOrder() != null){
+                        orders.add(el);
                     }
+
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
 
-        return PageRequest.of(filtro.getPage(), filtro.getSize());
+        orders.sort(Comparator.comparing(ElementoFiltro::getPrioridade));
+        String[] stringOrders = concat(orders);
+
+        if(orders.size() == 0){
+            sort = Sort.by(Sort.Direction.ASC, "id");
+        } else {
+            sort = Sort.by(direction, stringOrders);
+        }
+
+        return PageRequest.of(filtro.getPage(), filtro.getSize(), sort);
+    }
+
+    private String[] concat(List<ElementoFiltro> orders){
+
+        int size = (int) orders.stream().flatMap(o -> Arrays.stream(o.getOrder())).count();
+        String[] stringOrders = new String[size];
+
+        int position = 0;
+        for (ElementoFiltro o : orders) {
+            int insidePosition = 0;
+            for (String i : o.getOrder()) {
+                stringOrders[position++] = o.getOrder()[insidePosition++];
+            }
+        }
+
+        return stringOrders;
     }
 
     public List<T> listarTodos(){
@@ -200,6 +219,7 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
         getRepository().save(t);
     }
 
+    @Deprecated
     public void salvar(List<T> ts){
         ts.forEach(t -> verificarSalvar(t));
 

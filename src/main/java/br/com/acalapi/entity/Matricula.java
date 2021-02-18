@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -18,13 +19,16 @@ import java.util.List;
 public class Matricula extends AE {
 
     @Indexed
+    @NotNull
     private Integer numero;
 
     @Indexed
+    @NotNull
     private String letra;
 
     private String hidrometro;
 
+    @NotNull
     private Logradouro logradouro;
 
     private boolean possuiHidrometro;
