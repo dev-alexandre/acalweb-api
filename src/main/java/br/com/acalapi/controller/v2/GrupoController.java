@@ -32,7 +32,6 @@ public class GrupoController extends ControllerV2<Grupo, GrupoFiltro> {
         return service;
     }
 
-
     @RequestMapping(value = "/selecionar", method = RequestMethod.GET)
     public List<SelectDTO<Grupo>> Selecionar() {
         return service.listarSelect();

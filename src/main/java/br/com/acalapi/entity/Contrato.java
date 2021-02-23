@@ -1,12 +1,15 @@
 package br.com.acalapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,7 +22,8 @@ public class Contrato extends AE {
     @Transient
     public static final String SEQUENCE_NAME = "contrato_sequence";
 
-    private Long numero;
+    @Indexed
+    private long numero;
 
     private Cliente cliente;
 
@@ -35,6 +39,10 @@ public class Contrato extends AE {
 
     private List<Corte> corte;
 
+    @Indexed
     private boolean habilitado;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "ddMMyyyyHHmmss")
+    public LocalDateTime encerrado;
 
 }

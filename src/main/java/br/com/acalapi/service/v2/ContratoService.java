@@ -3,6 +3,8 @@ package br.com.acalapi.service.v2;
 import br.com.acalapi.entity.Cliente;
 import br.com.acalapi.entity.Contrato;
 import br.com.acalapi.entity.Grupo;
+import br.com.acalapi.entity.financeiro.Boleto;
+import br.com.acalapi.entity.sequence.DatabaseSequence;
 import br.com.acalapi.enumeration.constante.CheckboxEnum;
 import br.com.acalapi.exception.ConflictDataException;
 import br.com.acalapi.filtro.ClienteFiltro;
@@ -10,6 +12,7 @@ import br.com.acalapi.filtro.ContratoFiltro;
 import br.com.acalapi.filtro.v2.ElementoFiltro;
 import br.com.acalapi.repository.v2.ContratoRepository;
 import br.com.acalapi.service.ServiceV2;
+import br.com.acalapi.service.v1.DatabaseSequenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,6 +34,9 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
 
     @Autowired
     private ContratoRepository repository;
+
+    @Autowired
+    private DatabaseSequenceService databaseSequenceService;
 
     @Override
     public PagingAndSortingRepository getRepository() {
@@ -46,6 +53,8 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
         filterGrupo(filtro, query);
         filterCategoria(filtro, query);
         filterPrincipal(filtro, query);
+        filterIdLogradouro(filtro, query);
+        filterHabilitado(filtro, query);
 
         return query;
     }
@@ -124,12 +133,44 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
         }
     }
 
+    private void filterIdLogradouro(ContratoFiltro filtro, Query query) {
+        if(super.isValid(filtro.getIdLogradouro())){
+            query.addCriteria(
+                Criteria.where("matricula.logradouro.id").is(filtro.getIdLogradouro().getValor())
+            );
+        }
+    }
+
+    private void filterIdMatricula(ContratoFiltro filtro, Query query) {
+        if(super.isValid(filtro.getIdMatricula())){
+            query.addCriteria(
+                Criteria.where("matricula.id").is(filtro.getIdMatricula().getValor())
+            );
+        }
+    }
+
+    private void filterHabilitado(ContratoFiltro filtro, Query query) {
+        if(super.isValid(filtro.getHabilitadoo())){
+
+            if (filtro.getHabilitadoo().getValor().equals(CheckboxEnum.SIM.getValor())) {
+                query.addCriteria(
+                    Criteria.where("habilitado").is(true)
+                );
+            } else if (filtro.getHabilitadoo().getValor().equals(CheckboxEnum.SIM.getValor())) {
+                query.addCriteria(
+                    Criteria.where("habilitado").is(false)
+                );
+            }
+
+        }
+    }
 
     @Transactional
     @Override
     public void salvar(Contrato contrato) {
         verificarSalvar(contrato);
         permitirSomenteUmaMatriculaAtiva(contrato);
+        contrato.setNumero(databaseSequenceService.generateSequence(Contrato.SEQUENCE_NAME));
         getRepository().save(contrato);
     }
 
@@ -149,16 +190,26 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
 
     }
 
-
-
-
-
+    @Transactional
+    @Override
+    public void editar(Contrato contrato) {
+        if(!contrato.getAtivo()){
+            contrato.setEncerrado(LocalDateTime.now());
+        }
+        super.editar(contrato);
+        permitirSomenteUmaMatriculaAtiva(contrato);
+    }
 
     public List<Contrato> listarContratosDisponiveisPor(String referencia) {
 
         Query q = new Query();
         q.addCriteria(
-                Criteria.where("referencias").nin(referencia).and("habilitado").is(true)
+            Criteria
+                .where("referencias").nin(referencia)
+                .and("habilitado").is(true)
+                .and("ativo").is(true)
+                .and("matricula.hidrometro").ne(null)
+                .and("matricula.hidrometro").ne("")
         );
 
         return mongoTemplate.find(q, Contrato.class);
@@ -175,8 +226,8 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
 
             Query q = new Query();
             q.addCriteria(
-                    Criteria.where("cliente.documento").is(contrato.getCliente().getDocumento())
-                            .and("contratoPrincipal").is(true)
+                Criteria.where("cliente.documento").is(contrato.getCliente().getDocumento())
+                    .and("contratoPrincipal").is(true)
             );
 
             List<Contrato> contratoPrincipais = mongoTemplate.find(q, Contrato.class);
@@ -185,7 +236,19 @@ public class ContratoService extends ServiceV2<Contrato, ContratoFiltro> {
                     getRepository().save(c);
             });
         }
-
-
     }
+
+    public List<Contrato> listarHidrometrosPorContratratoFiltradosPorReferencia(String referencia){
+
+        Query query = new Query();
+        query.addCriteria(
+            Criteria
+                .where("matricula.possuiHidrometro").is(true)
+                .and("matricula.hidrometroList.referencia").nin(referencia)
+                .and("ativo").is(true)
+        );
+
+        return mongoTemplate.find(query, Contrato.class);
+    }
+
 }

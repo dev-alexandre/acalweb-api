@@ -39,6 +39,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
         filterHidrometro(filtro, query);
         filterLogradouro(filtro, query);
         filterTipoLogradouro(filtro, query);
+        filterIdLogradouro(filtro, query);
 
         return query;
     }
@@ -49,7 +50,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
     }
 
     private void filterNumero(MatriculaFiltro filtro, Query query) {
-        if(filtro.getNumero() != null && filtro.getNumero().getValor() != null && !filtro.getNumero().getValor().isEmpty()){
+        if(super.isValid(filtro.getNumero())){
             query.addCriteria(
                 Criteria.where("numero").is(Integer.valueOf(filtro.getNumero().getValor()))
             );
@@ -57,7 +58,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
     }
 
     private void filterLetra(MatriculaFiltro filtro, Query query) {
-        if(filtro.getLetra() != null && filtro.getLetra().getValor() != null && !filtro.getLetra().getValor().isEmpty()){
+        if(super.isValid(filtro.getLetra())){
             query.addCriteria(
                 Criteria.where("letra").regex(".*" + filtro.getLetra().getValor() + ".*", "i")
             );
@@ -65,7 +66,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
     }
 
     private void filterHidrometro(MatriculaFiltro filtro, Query query) {
-        if(filtro.getHidrometro() != null && filtro.getHidrometro().getValor() != null && !filtro.getHidrometro().getValor().isEmpty()){
+        if(super.isValid(filtro.getHidrometro())){
             query.addCriteria(
                     Criteria.where("hidrometro").regex(".*" + filtro.getHidrometro().getValor() + ".*", "i")
             );
@@ -73,7 +74,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
     }
 
     private void filterLogradouro(MatriculaFiltro filtro, Query query) {
-        if(filtro.getLogradouro() != null && filtro.getLogradouro().getValor() != null && !filtro.getLogradouro().getValor().isEmpty()){
+        if(super.isValid(filtro.getLogradouro())){
             query.addCriteria(
                 Criteria.where("logradouro.nome").regex(".*" + filtro.getLogradouro().getValor() + ".*", "i")
             );
@@ -81,9 +82,17 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
     }
 
     private void filterTipoLogradouro(MatriculaFiltro filtro, Query query) {
-        if(filtro.getTipoLogradouro() != null && filtro.getTipoLogradouro().getValor() != null && !filtro.getTipoLogradouro().getValor().isEmpty()){
+        if(super.isValid(filtro.getTipoLogradouro())){
             query.addCriteria(
                 Criteria.where("logradouro.tipoLogradouro.nome").regex(".*" + filtro.getTipoLogradouro().getValor() + ".*", "i")
+            );
+        }
+    }
+
+    private void filterIdLogradouro(MatriculaFiltro filtro, Query query) {
+        if(super.isValid(filtro.getIdLogradouro())){
+            query.addCriteria(
+                Criteria.where("logradouro.id").is(filtro.getIdLogradouro().getValor())
             );
         }
     }
@@ -157,7 +166,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
         return mongoOperations.find(new Query().addCriteria(criteria), Matricula.class);
     }
 
-    public List<SelectDTO<Matricula>> listarSelect(String name) {
+    public List<SelectDTO<Matricula>> selecionar(String name) {
 
         Criteria criteria = new Criteria();
         criteria.orOperator(
@@ -165,7 +174,7 @@ public class MatriculaService extends ServiceV2<Matricula, MatriculaFiltro> {
                 Criteria.where("logradouro.tipoLogradouro.nome").regex(".*" + name + ".*", "i")
         );
 
-        List<Matricula> matriculas = mongoOperations.find(new Query().limit(5).addCriteria(criteria), Matricula.class);
+        List<Matricula> matriculas = mongoOperations.find(new Query().limit(30).addCriteria(criteria), Matricula.class);
         List<SelectDTO<Matricula>> dados = new ArrayList<>();
         List<String> nomes = new ArrayList<>();
 

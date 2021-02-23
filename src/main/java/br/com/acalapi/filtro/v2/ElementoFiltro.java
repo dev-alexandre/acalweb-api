@@ -8,6 +8,6 @@ public class ElementoFiltro {
     private String valor;
     private String[] order;
     private Boolean asc;
-    private Integer prioridade;
+    private int prioridade;
 
 }

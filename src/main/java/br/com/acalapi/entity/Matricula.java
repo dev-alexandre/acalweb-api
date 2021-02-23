@@ -26,14 +26,11 @@ public class Matricula extends AE {
     @NotNull
     private String letra;
 
-    private String hidrometro;
-
     @NotNull
     private Logradouro logradouro;
 
-    private boolean possuiHidrometro;
+    private String hidrometro;
 
-    @DBRef
     private List<Hidrometro> hidrometroList;
 
 }

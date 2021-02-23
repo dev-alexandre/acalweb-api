@@ -38,8 +38,15 @@ public class ContratoController extends ControllerV2<Contrato, ContratoFiltro> {
         return service.listarContratosDisponiveisPor(referencia);
     }
 
+    @RequestMapping(value = "/listarMatriculasPorContrato/{referencia}", method = RequestMethod.GET)
+    public List<Contrato> listarMatriculasPorContrato(@PathVariable String referencia) {
+        return service.listarContratosDisponiveisPor(referencia);
+    }
+
     @RequestMapping(value = "/countByCategoria/{nome}", method = RequestMethod.GET)
     public long countByCategoria(@PathVariable String nome) {
         return service.countByCategoria(nome);
     }
+
+
 }

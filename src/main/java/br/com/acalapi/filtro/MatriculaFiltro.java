@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper=true)
 public class MatriculaFiltro extends Filtro {
 
+    private ElementoFiltro idLogradouro;
     private ElementoFiltro numero;
     private ElementoFiltro letra;
     private ElementoFiltro hidrometro;

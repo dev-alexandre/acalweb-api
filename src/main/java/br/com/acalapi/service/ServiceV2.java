@@ -41,15 +41,16 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
         persistentClass = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
+    public boolean isValid(ElementoFiltro parametro){
+        return (parametro != null && parametro.getValor()!= null && !parametro.getValor().isEmpty());
+    }
+
     public List<T> listar(F filtro){
         filtro = iniciarFiltro(filtro);
         Query query = new Query();
 
         filterAtivo(filtro, query);
         getQuery(filtro, query);
-
-        Sort sort = ordenarLista(filtro);
-        query.with(sort);
 
         return mongoOperations.find( query , persistentClass);
     }
@@ -239,5 +240,6 @@ public abstract class ServiceV2<T extends AE, F extends Filtro> {
 
     public void verificarSalvar(T t){ }
     public void verificarEditar(T t){ }
+
 
 }

@@ -5,6 +5,7 @@ import br.com.acalapi.filtro.v2.Filtro;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+
 @Data
 @EqualsAndHashCode(callSuper=true)
 public class ContratoFiltro extends Filtro {
@@ -18,5 +19,8 @@ public class ContratoFiltro extends Filtro {
     private ElementoFiltro grupo;
     private ElementoFiltro categoria;
     private ElementoFiltro valor;
+    private ElementoFiltro idLogradouro;
+    private ElementoFiltro idMatricula;
+    private ElementoFiltro habilitadoo;
 
 }
